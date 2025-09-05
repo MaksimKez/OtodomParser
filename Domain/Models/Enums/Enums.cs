@@ -11,6 +11,13 @@ public enum EstateType
     WAREHOUSE
 }
 
+public enum AvailabilityFrom
+{
+    ASAP,
+    MOUNTH,
+    THREEMOUNTH
+}
+
 public enum TransactionType
 {
     RENT,
