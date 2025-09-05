@@ -4,5 +4,5 @@ namespace Application.Abstractions;
 
 public interface IOtodomClient
 {
-    Task<IEnumerable<AdvertListItem>> GetAdvertsAsync();
+    Task<IEnumerable<AdvertListItem>> GetAdvertsAsync(string query);
 }
