@@ -1,9 +1,9 @@
 using System.Text;
-using Application.Services.Bases;
+using Application.Services.ChainOfSpecHandlers.Bases;
 using Domain.Models.Enums;
 using Domain.Models.Specs;
 
-namespace Application.Services;
+namespace Application.Services.ChainOfSpecHandlers;
 
 public class ExactSpecificationsHandler : SpecHandlerBase
 {

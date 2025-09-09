@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Application.Services.Interfaces;
+namespace Application.Services.ChainOfSpecHandlers.Interfaces;
 
 public interface ISpecHandler
 {

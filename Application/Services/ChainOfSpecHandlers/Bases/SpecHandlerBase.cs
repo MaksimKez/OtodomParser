@@ -1,7 +1,7 @@
 using System.Text;
-using Application.Services.Interfaces;
+using Application.Services.ChainOfSpecHandlers.Interfaces;
 
-namespace Application.Services.Bases;
+namespace Application.Services.ChainOfSpecHandlers.Bases;
 
 public abstract class SpecHandlerBase : ISpecHandler
 {
