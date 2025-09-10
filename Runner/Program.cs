@@ -1,7 +1,8 @@
-using System.Text;
-using Application.Abstractions;
+using Application.Extensions;
+using Application.Services.Interfaces;
+using Domain.Enums;
+using Domain.Models.Specs;
 using Infrastructure.Extensions;
-using Infrastructure.Parser;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,30 +13,39 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
+// Register layers
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var host = builder.Build();
 
 await using var scope = host.Services.CreateAsyncScope();
-var client = scope.ServiceProvider.GetRequiredService<IOtodomClient>();
+var otodom = scope.ServiceProvider.GetRequiredService<IOtodomService>();
 
-var path = "pl/wyniki/wynajem/mieszkanie/mazowieckie/warszawa?ownerTypeSingleSelect=ALL";
-var output = args.Length > 1 ? args[1] : Path.Combine(AppContext.BaseDirectory, "otodom_response.html");
-
-Console.WriteLine($"Fetching: {path}");
-var content = await client.GetPageContentAsync(path);
-
-var parsed = await new Parser(new Extractor()).ParseListingsAsync(content);
-foreach (var item in parsed)
+// Example specifications (adjust as needed)
+var baseSpecs = new BaseSpecifications
 {
-    Console.WriteLine(item.Url);
+    TransactionType = TransactionType.RENT,
+    EstateType = EstateType.FLAT,
+    Localization = "mazowieckie/warszawa",
+    DaysSinceCreated = 7
+};
+
+var defaultSpecs = new DefaultSpecifications
+{
+    PriceMin = 2000,
+    PriceMax = 6000,
+    AreaMin = 25,
+    AreaMax = 80
+};
+
+Console.WriteLine("Fetching listings using OtodomService...");
+var listings = await otodom.FetchListingsAsync(baseSpecs, defaultSpecs);
+
+int i = 0;
+foreach (var item in listings)
+{
+    Console.WriteLine($"[{++i}] {item.Url} | Price: {item.Price} | Area: {item.AreaMeterSqr} | Rooms: {item.Rooms}");
 }
 
-var outDir = Path.GetDirectoryName(output);
-if (!string.IsNullOrWhiteSpace(outDir) && !Directory.Exists(outDir))
-{
-    Directory.CreateDirectory(outDir);
-}
-
-await File.WriteAllTextAsync(output, content, Encoding.UTF8);
-Console.WriteLine($"Saved to: {output}");
+Console.WriteLine($"Total listings: {i}");
