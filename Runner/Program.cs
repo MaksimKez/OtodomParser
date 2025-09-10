@@ -4,6 +4,7 @@ using Infrastructure.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Runner;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -26,6 +27,12 @@ var output = args.Length > 1 ? args[1] : Path.Combine(AppContext.BaseDirectory, 
 
 Console.WriteLine($"Fetching: {path}");
 var content = await client.GetPageContentAsync(path);
+
+var parsed = await new Parser().ParseListingsAsync(content);
+foreach (var item in parsed)
+{
+    Console.WriteLine(item.Url);
+}
 
 // Ensure directory exists
 var outDir = Path.GetDirectoryName(output);

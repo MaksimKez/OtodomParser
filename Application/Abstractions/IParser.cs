@@ -5,5 +5,5 @@ namespace Application.Abstractions;
 
 public interface IParser
 {
-    Task<IEnumerable<AdvertListItem>> ParseListingsAsync(string listingText);
+    Task<IEnumerable<ListingCommon>> ParseListingsAsync(string listingText);
 }
