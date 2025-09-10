@@ -10,13 +10,13 @@ public class BaseSpecificationsHandler : SpecHandlerBase
     public override StringBuilder Handle(object spec, StringBuilder sb)
     {
         if (spec is not BaseSpecifications baseSpec) return base.Handle(spec, sb);
-
+        
         if (baseSpec.TransactionType is not null) sb.Append($"{HandleTransactionType(baseSpec.TransactionType)}/");
         
         if (baseSpec.EstateType is not null) sb.Append($"{HandleEstateType(baseSpec.EstateType)}/");
         
         if (baseSpec.Localization is not null)
-            sb.Append($"{baseSpec.Localization}?");
+            sb.Append($"{HandleLocalization(baseSpec.Localization)}/");
         else
             sb.Append("cala-polska?");
         
@@ -26,6 +26,11 @@ public class BaseSpecificationsHandler : SpecHandlerBase
         return base.Handle(spec, sb);
     }
 
+    private static string HandleLocalization(string localization)
+    {
+        //todo map for cities
+        return "mazowieckie/warszawa";
+    }
 
     private static string HandleTransactionType(TransactionType? transactionType) =>
         transactionType switch
