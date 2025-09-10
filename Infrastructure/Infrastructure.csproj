@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -12,6 +12,8 @@
 
     <ItemGroup>
       <PackageReference Include="Refit" Version="8.0.0" />
+      <PackageReference Include="Polly" Version="8.4.2" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
