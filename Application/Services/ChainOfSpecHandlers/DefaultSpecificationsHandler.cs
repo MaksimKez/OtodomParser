@@ -1,6 +1,6 @@
 using System.Text;
 using Application.Services.ChainOfSpecHandlers.Bases;
-using Domain.Models.Enums;
+using Domain.Enums;
 using Domain.Models.Specs;
 
 namespace Application.Services.ChainOfSpecHandlers;

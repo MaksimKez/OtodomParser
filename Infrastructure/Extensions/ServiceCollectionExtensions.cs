@@ -3,6 +3,8 @@ using System.Net.Http;
 using Application.Abstractions;
 using Infrastructure.Client;
 using Infrastructure.Models;
+using Infrastructure.Parser;
+using Infrastructure.Parser.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -13,7 +15,7 @@ namespace Infrastructure.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddOtodomClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<OtodomApiSettings>(configuration.GetSection(OtodomApiSettings.ConfigName));
         services.Configure<PollySettings>(configuration.GetSection(PollySettings.ConfigName));
@@ -33,7 +35,7 @@ public static class ServiceCollectionExtensions
                     .HandleResult(resp =>
                     {
                         var status = (int)resp.StatusCode;
-                        return status == 429 || status >= 500;
+                        return status is 429 or >= 500;
                     })
             };
 
@@ -68,6 +70,9 @@ public static class ServiceCollectionExtensions
             UseCookies = true,
             CookieContainer = new CookieContainer(),
         });
+
+        services.AddScoped<IExtractor, Extractor>();
+        services.AddScoped<IParser, Parser.Parser>();
 
         return services;
     }

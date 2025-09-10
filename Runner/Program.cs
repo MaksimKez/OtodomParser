@@ -1,20 +1,19 @@
 using System.Text;
 using Application.Abstractions;
 using Infrastructure.Extensions;
+using Infrastructure.Parser;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Runner;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// Configuration: appsettings.json in Runner project
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Register Infrastructure client and resilience
-builder.Services.AddOtodomClient(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var host = builder.Build();
 
@@ -28,7 +27,7 @@ var output = args.Length > 1 ? args[1] : Path.Combine(AppContext.BaseDirectory, 
 Console.WriteLine($"Fetching: {path}");
 var content = await client.GetPageContentAsync(path);
 
-var parsed = await new Parser().ParseListingsAsync(content);
+var parsed = await new Parser(new Extractor()).ParseListingsAsync(content);
 foreach (var item in parsed)
 {
     Console.WriteLine(item.Url);
