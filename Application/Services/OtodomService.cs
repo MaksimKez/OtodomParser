@@ -36,7 +36,7 @@ public class OtodomService : IOtodomService
 
     public async Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[] specs)
     {
-        var sb = new StringBuilder();
+        /*var sb = new StringBuilder();
         sb.Append("pl/wyniki/");
 
         if (specs != null)
@@ -48,12 +48,15 @@ public class OtodomService : IOtodomService
             }
         }
 
-        var path = NormalizePath(sb.ToString());
+        var path = NormalizePath(sb.ToString());*/
+
+        var path = "pl/wyniki/wynajem/mieszkanie/cala-polska?by=latest&ownerTypeSingleSelect=ALL";
 
         var html = await _client.GetPageContentAsync(path);
         var listings = await _parser.ParseListingsAsync(html);
         return listings;
     }
+
 
     private static string NormalizePath(string raw)
     {
