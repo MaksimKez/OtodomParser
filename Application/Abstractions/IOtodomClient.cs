@@ -4,5 +4,5 @@ namespace Application.Abstractions;
 
 public interface IOtodomClient
 {
-    Task<string> GetPageContentAsync(string query);
+    Task<string> GetPageContentAsync(string path);
 }

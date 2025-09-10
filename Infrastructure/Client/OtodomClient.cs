@@ -2,9 +2,9 @@ using Application.Abstractions;
 
 namespace Infrastructure.Client;
 
-public class OtodomClient : IOtodomClient
+public class OtodomClient(IOtodomApi otodomApi) : IOtodomClient
 {
-    public Task<string> GetPageContentAsync(string query)
+    public async Task<string> GetPageContentAsync(string path)
     {
         
     }
