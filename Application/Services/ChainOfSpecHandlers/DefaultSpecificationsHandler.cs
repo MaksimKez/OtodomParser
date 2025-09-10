@@ -36,21 +36,44 @@ public class DefaultSpecificationsHandler : SpecHandlerBase
     {
         var sb = new StringBuilder();
         sb.Append("roomsNumber=");
-
-        foreach (var roomCount in roomNumbers)
+        var first = true;
+        foreach (var roomCount in roomNumbers ?? throw new ArgumentNullException(nameof(roomNumbers)))
         {
-            switch (roomCount)
+            string token = roomCount! switch
             {
-                case RoomNumber.ONE: sb.Append("%5BONE"); break;
-                case RoomNumber.TWO: sb.Append("%2CTWO"); break;
-                case RoomNumber.THREE: sb.Append("%2CTHREE"); break;
-                case RoomNumber.FOUR: sb.Append("%2CFOUR"); break;
-                case RoomNumber.FIVE_AND_MORE: sb.Append("%2CFIVE%2CSIX_OR_MORE"); break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                RoomNumber.ONE => "ONE",
+                RoomNumber.TWO => "TWO",
+                RoomNumber.THREE => "THREE",
+                RoomNumber.FOUR => "FOUR",
+                RoomNumber.FIVE_AND_MORE => null, // will add two tokens below
+                _ => throw new ArgumentOutOfRangeException()
+            } ?? throw new Exception();
+
+            if (roomCount == RoomNumber.FIVE_AND_MORE)
+            {
+                // FIVE and SIX_OR_MORE
+                if (first)
+                {
+                    sb.Append("%5BFIVE%2CSIX_OR_MORE");
+                    first = false;
+                }
+                else
+                {
+                    sb.Append("%2CFIVE%2CSIX_OR_MORE");
+                }
+                continue;
+            }
+
+            if (first)
+            {
+                sb.Append("%5B" + token);
+                first = false;
+            }
+            else
+            {
+                sb.Append("%2C" + token);
             }
         }
-        
         sb.Append("%5D");
         return sb.ToString();
     }

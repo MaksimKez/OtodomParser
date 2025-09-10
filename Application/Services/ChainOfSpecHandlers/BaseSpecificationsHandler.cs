@@ -16,7 +16,7 @@ public class BaseSpecificationsHandler : SpecHandlerBase
         if (baseSpec.EstateType is not null) sb.Append($"{HandleEstateType(baseSpec.EstateType)}/");
         
         if (baseSpec.Localization is not null)
-            sb.Append($"{HandleLocalization(baseSpec.Localization)}/?");
+            sb.Append($"{HandleLocalization(baseSpec.Localization)}?");
         else
             sb.Append("cala-polska?");
         

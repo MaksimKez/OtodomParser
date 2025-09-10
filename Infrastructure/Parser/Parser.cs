@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System.Text.Json;
 using Application.Abstractions;
 using Domain.Models.Common;
@@ -22,6 +23,13 @@ public class Parser(IExtractor extractor) : IParser
 
         var jsonNode = doc.DocumentNode
             .SelectSingleNode("//script[@type='application/ld+json']");
+
+        if (jsonNode == null)
+        {
+            throw new Exception();
+            // Could be that the page rendered via JS or structure changed; return empty list gracefully
+            return new List<ListingCommon>();
+        }
 
         var json = jsonNode.InnerText;
 
