@@ -24,9 +24,10 @@ public class DefaultSpecificationsHandler : SpecHandlerBase
             sb.Append($"areaMax={defSpec.AreaMax}&");
 
         if (defSpec.RoomNumber is not null)
-        {
-            sb.Append($"{defSpec.RoomNumber}&");
-        }
+            sb.Append($"{HandleRoomNumber(defSpec.RoomNumber)}&");
+        
+        if (defSpec.Floors is not null)
+            sb.Append($"{HandleFloors(defSpec.Floors)}&");
         
         return base.Handle(spec, sb);
     }
@@ -50,6 +51,43 @@ public class DefaultSpecificationsHandler : SpecHandlerBase
             }
         }
         
+        sb.Append("%5D");
+        return sb.ToString();
+    }
+
+    private string HandleFloors(IEnumerable<FloorNumber> floors)
+    {
+        var sb = new StringBuilder();
+        sb.Append("floors=");
+        var first = true;
+        foreach (var floor in floors)
+        {
+            string token = floor switch
+            {
+                FloorNumber.GROUND => "GROUND",
+                FloorNumber.FIRST => "FIRST",
+                FloorNumber.SECOND => "SECOND",
+                FloorNumber.THIRD => "THIRD",
+                FloorNumber.FOURTH => "FOURTH",
+                FloorNumber.FIFTH => "FIFTH",
+                FloorNumber.SIXTH => "SIXTH",
+                FloorNumber.SEVENTH => "SEVENTH",
+                FloorNumber.EIGHTH => "EIGHTH",
+                FloorNumber.NINTH => "NINTH",
+                FloorNumber.TENTH => "TENTH",
+                FloorNumber.HIGHER_THAN_TENTH => "HIGHER_THAN_TENTH",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            if (first)
+            {
+                sb.Append("%5B" + token);
+                first = false;
+            }
+            else
+            {
+                sb.Append("%2C" + token);
+            }
+        }
         sb.Append("%5D");
         return sb.ToString();
     }

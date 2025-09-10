@@ -22,21 +22,24 @@ var host = builder.Build();
 await using var scope = host.Services.CreateAsyncScope();
 var otodom = scope.ServiceProvider.GetRequiredService<IOtodomService>();
 
-// Example specifications (adjust as needed)
+// Example specifications for:
+// rent a flat in Warsaw, 2000-5000 PLN, 20-50 m2, 2 or 3 rooms, 1st floor, last 1 day
 var baseSpecs = new BaseSpecifications
 {
     TransactionType = TransactionType.RENT,
     EstateType = EstateType.FLAT,
-    Localization = "mazowieckie/warszawa",
-    DaysSinceCreated = 7
+    Localization = "mazowieckie/warszawa/warszawa/warszawa",
+    DaysSinceCreated = 1
 };
 
 var defaultSpecs = new DefaultSpecifications
 {
     PriceMin = 2000,
-    PriceMax = 6000,
-    AreaMin = 25,
-    AreaMax = 80
+    PriceMax = 5000,
+    AreaMin = 20,
+    AreaMax = 50,
+    RoomNumber = new[] { RoomNumber.TWO, RoomNumber.THREE },
+    Floors = new[] { FloorNumber.FIRST }
 };
 
 Console.WriteLine("Fetching listings using OtodomService...");

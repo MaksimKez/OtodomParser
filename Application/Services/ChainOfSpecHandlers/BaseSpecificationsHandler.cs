@@ -16,7 +16,7 @@ public class BaseSpecificationsHandler : SpecHandlerBase
         if (baseSpec.EstateType is not null) sb.Append($"{HandleEstateType(baseSpec.EstateType)}/");
         
         if (baseSpec.Localization is not null)
-            sb.Append($"{HandleLocalization(baseSpec.Localization)}/");
+            sb.Append($"{HandleLocalization(baseSpec.Localization)}/?");
         else
             sb.Append("cala-polska?");
         
@@ -28,8 +28,8 @@ public class BaseSpecificationsHandler : SpecHandlerBase
 
     private static string HandleLocalization(string localization)
     {
-        //todo map for cities
-        return "mazowieckie/warszawa";
+        // Use provided localization verbatim (e.g., "mazowieckie/warszawa/warszawa/warszawa")
+        return localization.Trim('/');
     }
 
     private static string HandleTransactionType(TransactionType? transactionType) =>

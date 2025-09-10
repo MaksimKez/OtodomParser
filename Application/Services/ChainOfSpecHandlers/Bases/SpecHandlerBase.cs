@@ -15,7 +15,6 @@ public abstract class SpecHandlerBase : ISpecHandler
 
     public virtual StringBuilder Handle(object spec, StringBuilder sb)
     {
-        sb.Append("/wyniki/");
         return _next != null ? _next.Handle(spec, sb) : sb;
     }
 }

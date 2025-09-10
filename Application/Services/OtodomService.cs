@@ -83,17 +83,53 @@ public class OtodomService : IOtodomService
         var query = path[(idxQuestion + 1)..];
 
         var parts = query.Split('&', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
-        if (parts.Count <= 0) return path;
-        
-        var daysParts = parts.Where(p => p.StartsWith("daysSinceCreated=", StringComparison.OrdinalIgnoreCase)).ToList();
-        if (daysParts.Count > 0)
+        if (parts.Count <= 0)
         {
-            foreach (var d in daysParts)
-                parts.Remove(d);
-            parts.AddRange(daysParts);
+            // If there are no parts, we still want to enforce defaults
+            parts = new List<string>();
         }
 
-        var rebuilt = string.Join('&', parts);
+        // Parse into a lookup of key -> last value occurrence
+        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var p in parts)
+        {
+            var idx = p.IndexOf('=');
+            if (idx <= 0) continue;
+            var k = p[..idx];
+            var v = p[(idx + 1)..];
+            map[k] = v; // keep last occurrence
+        }
+
+        // Inject defaults if missing
+        if (!map.ContainsKey("limit")) map["limit"] = "36";
+        if (!map.ContainsKey("by")) map["by"] = "DEFAULT";
+        if (!map.ContainsKey("direction")) map["direction"] = "DESC";
+
+        // Rebuild in EXACT desired order
+        var order = new[]
+        {
+            "limit",
+            "priceMin",
+            "priceMax",
+            "areaMin",
+            "areaMax",
+            "roomsNumber",
+            "daysSinceCreated",
+            "floors",
+            "by",
+            "direction"
+        };
+
+        var rebuiltParts = new List<string>();
+        foreach (var key in order)
+        {
+            if (map.TryGetValue(key, out var val))
+            {
+                rebuiltParts.Add($"{key}={val}");
+            }
+        }
+
+        var rebuilt = string.Join('&', rebuiltParts);
         path = basePart + rebuilt;
 
         return path;
