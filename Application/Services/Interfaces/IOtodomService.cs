@@ -5,5 +5,5 @@ namespace Application.Services.Interfaces;
 
 public interface IOtodomService
 {
-    Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[] specs);
+    Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[]? specs);
 }

@@ -20,19 +20,24 @@ public class OtodomService : IOtodomService
         _parser = parser;
         _pathProvider = pathProvider;
         
-        // chain construction moved to factory to respect SRP and DIP
         _ = chainFactory.Create();
     }
 
-    public async Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[] specs)
+    public async Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[]? specs)
     {
-        var pathWithFilters = _pathProvider.BuildFilteredPath(specs);
         
-        //var pathWithoutFilters = _pathProvider.BuildNonFilteredPath(specs);
-        
-        var html = await _client.GetPageContentAsync(pathWithFilters);
-        
-        //todo if-se for filtered/nonfiltered
+        string path;
+        if (specs is null)
+            path = _pathProvider.GetNonFilteredPath();
+        else
+            path = specs.Length switch
+            {
+                1 => _pathProvider.BuildDaysSinceCreatedOnly(specs[0]),
+                > 0 => _pathProvider.BuildFilteredPath(specs),
+                _ => _pathProvider.BuildNonFilteredPath(specs)
+            };
+
+        var html = await _client.GetPageContentAsync(path);
         
         var listings = await _parser.ParseFilteredListingsAsync(html);
         return listings;
