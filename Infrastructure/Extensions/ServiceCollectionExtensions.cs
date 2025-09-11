@@ -72,6 +72,7 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddScoped<IExtractor, Extractor>();
+        services.AddScoped<IListingUtilities, ListingUtilities>();
         services.AddScoped<ILdJsonListingsParser, LdJsonListingsParser>();
         services.AddScoped<IFilteredListingsParser, FilteredListingsParser>();
         services.AddScoped<IParser, Parser.Parser>();

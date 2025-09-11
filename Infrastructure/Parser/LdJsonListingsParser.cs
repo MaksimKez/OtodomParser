@@ -7,15 +7,8 @@ using Infrastructure.Parser.Interfaces;
 
 namespace Infrastructure.Parser;
 
-public class LdJsonListingsParser : ILdJsonListingsParser
+public class LdJsonListingsParser(IExtractor extractor) : ILdJsonListingsParser
 {
-    private readonly IExtractor _extractor;
-
-    public LdJsonListingsParser(IExtractor extractor)
-    {
-        _extractor = extractor;
-    }
-
     public Task<IEnumerable<ListingCommon>> ParseAsync(string html)
     {
         var listings = ParseHtml(html);
@@ -31,9 +24,7 @@ public class LdJsonListingsParser : ILdJsonListingsParser
             .SelectSingleNode("//script[@type='application/ld+json']");
 
         if (jsonNode == null)
-        {
-            throw new Exception();
-        }
+            return new List<ListingCommon>();
 
         var json = jsonNode.InnerText;
 
@@ -57,11 +48,11 @@ public class LdJsonListingsParser : ILdJsonListingsParser
             Price = o.Price,
             AreaMeterSqr = o.ItemOffered?.FloorSize?.Value ?? 0,
             Rooms = o.ItemOffered?.NumberOfRooms ?? 0,
-            Floor = _extractor.ExtractFloor(o.ItemOffered?.Description ?? "noinfo"),
-            IsFurnished = _extractor.ExtractIsFurnished(o.ItemOffered?.Description ?? "noinfo"),
-            PetsAllowed = _extractor.ExtractPets(o.ItemOffered?.Description ?? "noinfo"),
-            HasBalcony = _extractor.ExtractBalcony(o.ItemOffered?.Description ?? "noinfo"),
-            HasAppliances = _extractor.ExtractAppliances(o.ItemOffered?.Description ?? "noinfo"),
+            Floor = extractor.ExtractFloor(o.ItemOffered?.Description ?? "noinfo"),
+            IsFurnished = extractor.ExtractIsFurnished(o.ItemOffered?.Description ?? "noinfo"),
+            PetsAllowed = extractor.ExtractPets(o.ItemOffered?.Description ?? "noinfo"),
+            HasBalcony = extractor.ExtractBalcony(o.ItemOffered?.Description ?? "noinfo"),
+            HasAppliances = extractor.ExtractAppliances(o.ItemOffered?.Description ?? "noinfo"),
             Url = o.Url,
             CreatedAt = DateTime.UtcNow,
             ImageLink = o.Image

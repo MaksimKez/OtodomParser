@@ -7,10 +7,8 @@ using Infrastructure.Parser.Interfaces;
 
 namespace Infrastructure.Parser;
 
-public class FilteredListingsParser : IFilteredListingsParser
+public class FilteredListingsParser(IListingUtilities utils) : IFilteredListingsParser
 {
-    private const string OtodomBase = "https://www.otodom.pl";
-
     public Task<IEnumerable<ListingCommon>> ParseAsync(string html)
     {
         var doc = new HtmlDocument();
@@ -49,11 +47,11 @@ public class FilteredListingsParser : IFilteredListingsParser
             Id = Guid.NewGuid(),
             Price = i.TotalPrice?.Value ?? 0,
             AreaMeterSqr = (decimal)(i.AreaInSquareMeters),
-            Rooms = MapRooms(i.RoomsNumber),
-            Floor = MapFloor(i.FloorNumber),
-            Url = BuildAbsoluteUrl(i.Href, lang),
+            Rooms = utils.MapRooms(i.RoomsNumber),
+            Floor = utils.MapFloor(i.FloorNumber),
+            Url = utils.BuildAbsoluteUrl(i.Href, lang),
             CreatedAt = i.CreatedAtFirst,
-            ImageLink = BuildAbsoluteUrl(i.Images.FirstOrDefault()?.Large ?? "", lang),
+            ImageLink = utils.BuildAbsoluteUrl(i.Images.FirstOrDefault()?.Large ?? "", lang),
             IsFurnished = false,
             PetsAllowed = false,
             HasBalcony = false,
@@ -61,60 +59,5 @@ public class FilteredListingsParser : IFilteredListingsParser
         }).ToList();
 
         return Task.FromResult<IEnumerable<ListingCommon>>(listings);
-    }
-
-    private string BuildAbsoluteUrl(string href, string lang = "pl")
-    {
-        if (string.IsNullOrWhiteSpace(href))
-            return null;
-
-        href = href.Trim();
-
-        if (href.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-            href.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-        {
-            return href;
-        }
-
-        href = Regex.Replace(href, @"\[(?:lang)\]", lang, RegexOptions.IgnoreCase);
-
-        if (!href.StartsWith("/"))
-            href = "/" + href;
-
-        var langEscaped = Regex.Escape(lang);
-        href = Regex.Replace(href,
-            $@"^/{langEscaped}/ad(?=/|$)",
-            $"/{lang}/oferta",
-            RegexOptions.IgnoreCase);
-
-        href = Regex.Replace(href, @"/ad/", "/oferta/", RegexOptions.IgnoreCase);
-
-        href = Regex.Replace(href, @"^/ad(?=$|/|\?)", $"/{lang}/oferta", RegexOptions.IgnoreCase);
-
-        return OtodomBase + href;
-    }
-
-    private int MapRooms(string rooms)
-    {
-        return rooms.ToUpper() switch
-        {
-            "ONE" => 1,
-            "TWO" => 2,
-            "THREE" => 3,
-            "FOUR" => 4,
-            _ => 0
-        };
-    }
-
-    private int MapFloor(string floor)
-    {
-        return floor.ToUpper() switch
-        {
-            "GROUND" => 0,
-            "FIRST" => 1,
-            "SECOND" => 2,
-            "THIRD" => 3,
-            _ => -1
-        };
     }
 }
