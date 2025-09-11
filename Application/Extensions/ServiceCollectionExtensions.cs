@@ -13,6 +13,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<DefaultSpecificationsHandler>();
         services.AddTransient<ExactSpecificationsHandler>();
 
+        services.AddScoped<ISpecHandlerChainFactory, SpecHandlerChainFactory>();
+        services.AddScoped<IListingPathProvider, ListingPathProvider>();
+
         services.AddScoped<IOtodomService, OtodomService>();
 
         return services;

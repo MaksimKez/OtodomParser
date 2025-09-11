@@ -11,43 +11,29 @@ public class OtodomService : IOtodomService
 {
     private readonly IOtodomClient _client;
     private readonly IParser _parser;
-    private readonly BaseSpecificationsHandler _baseHandler;
+    private readonly ISpecHandlerChainFactory _chainFactory;
+    private readonly IListingPathProvider _pathProvider;
 
     public OtodomService(
         IOtodomClient client,
         IParser parser,
-        BaseSpecificationsHandler baseHandler,
-        DefaultSpecificationsHandler defaultHandler,
-        ExactSpecificationsHandler exactHandler)
+        ISpecHandlerChainFactory chainFactory,
+        IListingPathProvider pathProvider)
     {
         _client = client;
         _parser = parser;
-        _baseHandler = baseHandler;
-
-        //base -> default -> exact
-        _baseHandler
-            .SetNext(defaultHandler)
-            .SetNext(exactHandler);
+        _chainFactory = chainFactory;
+        _pathProvider = pathProvider;
+        
+        // chain construction moved to factory to respect SRP and DIP
+        _ = _chainFactory.Create();
     }
 
     public async Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[] specs)
     {
-        /*var sb = new StringBuilder();
-        sb.Append("pl/wyniki/");
-
-        if (specs != null)
-        {
-            foreach (var spec in specs)
-            {
-                if (spec == null) continue;
-                _baseHandler.Handle(spec, sb);
-            }
-        }*/
-
-        var pathWithFilters = "pl/wyniki/wynajem/mieszkanie/mazowieckie/warszawa/warszawa/warszawa?limit=36&priceMin=2000&priceMax=5000&areaMin=20&areaMax=50&roomsNumber=%5BTWO%2CTHREE%5D&daysSinceCreated=1&floors=%5BFIRST%5D&by=DEFAULT&direction=DESC";
-
-        var pathWithoutFilters = "pl/wyniki/wynajem/mieszkanie/mazowieckie/warszawa/warszawa/warszawa?limit=36&by=DEFAULT&direction=DESC";
+        var pathWithFilters = _pathProvider.BuildFilteredPath(specs);
         
+        //var pathWithoutFilters = _pathProvider.BuildNonFilteredPath(specs);
         
         var html = await _client.GetPageContentAsync(pathWithFilters);
         
