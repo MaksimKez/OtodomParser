@@ -1,9 +1,6 @@
 using Application.Services.Interfaces;
 using Domain.Models.Common;
-using Domain.Models.Specs;
-using System.Text;
 using Application.Abstractions;
-using Application.Services.ChainOfSpecHandlers;
 
 namespace Application.Services;
 
@@ -11,7 +8,6 @@ public class OtodomService : IOtodomService
 {
     private readonly IOtodomClient _client;
     private readonly IParser _parser;
-    private readonly ISpecHandlerChainFactory _chainFactory;
     private readonly IListingPathProvider _pathProvider;
 
     public OtodomService(
@@ -22,11 +18,10 @@ public class OtodomService : IOtodomService
     {
         _client = client;
         _parser = parser;
-        _chainFactory = chainFactory;
         _pathProvider = pathProvider;
         
         // chain construction moved to factory to respect SRP and DIP
-        _ = _chainFactory.Create();
+        _ = chainFactory.Create();
     }
 
     public async Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[] specs)
