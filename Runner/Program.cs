@@ -22,8 +22,6 @@ var host = builder.Build();
 await using var scope = host.Services.CreateAsyncScope();
 var otodom = scope.ServiceProvider.GetRequiredService<IOtodomService>();
 
-// Example specifications for:
-// rent a flat in Warsaw, 2000-5000 PLN, 20-50 m2, 2 or 3 rooms, 1st floor, last 1 day
 var baseSpecs = new BaseSpecifications
 {
     TransactionType = TransactionType.RENT,
