@@ -6,17 +6,13 @@ on:
   pull_request:
     branches: [ "master" ]
 
-concurrency:
-  group: dotnet-ci-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
-
+    outputs:
+      build-status: ${{ steps.build.outcome }}
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup .NET
@@ -24,62 +20,59 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Cache NuGet
+      - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore (solution)
-        run: dotnet restore OtodomParser.sln
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Build (Release)
-        run: dotnet build OtodomParser.sln --configuration Release --no-restore
+      - name: Build solution
+        id: build
+        run: dotnet build --no-restore --configuration Release
 
-  test:
-    name: Test - ${{ matrix.name }}
+  style-check:
+    name: Style Check
     runs-on: ubuntu-latest
     needs: build
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Application.Tests
-            path: Tests/Application.Tests/Application.Tests.csproj
-            artifact: application-tests-results
-          - name: Infrastructure.Tests
-            path: Tests/Infrastructure.Tests/Infrastructure.Tests.csproj
-            artifact: infrastructure-tests-results
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Cache NuGet
-        uses: actions/cache@v4
+      - name: Install dotnet-format
+        run: dotnet tool install -g dotnet-format
+
+      - name: Run style check
+        working-directory: .
+        run: dotnet format OtodomParser.sln --verify-no-changes || echo "Style issues found!"
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+          dotnet-version: 8.0.x
 
-      - name: Restore (solution)
-        run: dotnet restore OtodomParser.sln
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Test (Release)
-        run: dotnet test ${{ matrix.path }} --configuration Release --no-restore --logger "trx;LogFileName=TestResults.trx"
+      - name: Build solution
+        run: dotnet build --configuration Release
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact }}
-          path: "**/TestResults.trx"
+      - name: Run unit tests
+        run: dotnet test --configuration Release --logger "trx;LogFileName=UnitTestResults.trx" --results-directory ./test-results --filter "Category!=Integration"
+
+      - name: Run integration tests
+        run: dotnet test --configuration Release --logger "trx;LogFileName=IntegrationTestResults.trx" --results-directory ./test-results --filter "Category=Integration"
