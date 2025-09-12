@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Rabbitmq.Models;
 
-public sealed class RabbitMqSettings
+public class RabbitMqSettings
 {
     public const string ConfigName = "RabbitMq";
 
@@ -17,7 +17,6 @@ public sealed class RabbitMqSettings
 
     public string VirtualHost { get; init; } = "/";
 
-    // Exchange and queue settings
     [Required]
     public string Exchange { get; init; } = "otodom.exchange";
 
@@ -32,7 +31,6 @@ public sealed class RabbitMqSettings
 
     public bool DeclareTopology { get; init; } = true;
 
-    // Publisher options
     public bool PublisherConfirms { get; init; } = true;
 
     public ushort PrefetchCount { get; init; } = 10;
