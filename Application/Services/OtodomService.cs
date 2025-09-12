@@ -27,7 +27,7 @@ public class OtodomService : IOtodomService
         _ = chainFactory.Create();
     }
 
-    public async Task<IEnumerable<ListingCommon>> FetchAndPublish()
+    public async Task FetchAndPublish()
     {
         var path = _pathProvider.GetNonFilteredPath();
         var html = await _client.GetPageContentAsync(path);
@@ -37,7 +37,6 @@ public class OtodomService : IOtodomService
             
         }
         await _publisher.PublishAsync(listings);
-        return listings;
     }
 
 

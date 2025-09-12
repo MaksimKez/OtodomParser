@@ -5,5 +5,6 @@ namespace Application.Services.Interfaces;
 
 public interface IOtodomService
 {
+    Task FetchAndPublish();
     Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[]? specs);
 }
