@@ -27,7 +27,7 @@ public class OtodomServiceTests
         parser.Setup(p => p.ParseFilteredListingsAsync(html)).ReturnsAsync(parsed);
         chainFactory.Setup(f => f.Create()).Returns(Mock.Of<Application.Services.ChainOfSpecHandlers.BaseSpecificationsHandler>());
 
-        var sut = new OtodomService(client.Object, parser.Object, chainFactory.Object, pathProvider.Object);
+        var sut = new OtodomService(client.Object, parser.Object, chainFactory.Object, pathProvider.Object, null);
 
         // Act
         var result = await sut.FetchListingsAsync("spec1");
