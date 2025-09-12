@@ -49,6 +49,6 @@ public class ListingPathProvider(ISpecHandlerChainFactory chainFactory) : IListi
         return sb.ToString();
     }
 
-    public string BuildDaysSinceCreatedOnly(object specs)
+    public string BuildDaysSinceCreatedOnly(int specs)
         => $"pl/wyniki/wynajem/mieszkanie/cala-polska?daysSinceCreated={specs.ToString()}&by=DEFAULT&direction=DESC";
 }

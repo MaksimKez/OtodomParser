@@ -1,6 +1,7 @@
 using Application.Services.Interfaces;
 using Domain.Models.Common;
 using Application.Abstractions;
+using Domain.Models.Specs;
 
 namespace Application.Services;
 
@@ -33,15 +34,18 @@ public class OtodomService : IOtodomService
             return await _parser.ParseListingsAsync(html);
         }
 
-        path = specs.Length switch
+        if (specs[0] is BaseSpecifications)
         {
-            1 => _pathProvider.BuildDaysSinceCreatedOnly(specs[0]),
-            _ => _pathProvider.BuildFilteredPath(specs),
-        };
+            var spec = (BaseSpecifications)specs[0];
+            path = _pathProvider.BuildDaysSinceCreatedOnly((int)spec.DaysSinceCreated!);
+            html = await _client.GetPageContentAsync(path);
+            return await _parser.ParseFilteredListingsAsync(html);
+        }
+
+        path = _pathProvider.BuildFilteredPath(specs);
 
         html = await _client.GetPageContentAsync(path);
         
-        var listings = await _parser.ParseFilteredListingsAsync(html);
-        return listings;
+        return  await _parser.ParseFilteredListingsAsync(html);
     }
 }

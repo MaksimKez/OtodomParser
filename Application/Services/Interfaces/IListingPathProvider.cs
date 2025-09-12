@@ -7,5 +7,5 @@ public interface IListingPathProvider
 
     string BuildFilteredPath(params object[]? specs);
     string BuildNonFilteredPath(params object[]? specs);
-    string BuildDaysSinceCreatedOnly(object specs);
+    string BuildDaysSinceCreatedOnly(int specs);
 }

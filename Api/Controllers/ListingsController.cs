@@ -19,12 +19,7 @@ public class ListingsController(IOtodomService otodomService) : ControllerBase
             var listings = await otodomService.FetchListingsAsync(null);
             return Ok(listings);
         }
-
-        if (createdWithin is not (1 or 3 or 7))
-        {
-            return BadRequest("createdWithin must be one of: 1, 3, 7");
-        }
-
+        
         var specs = new BaseSpecifications { DaysSinceCreated = createdWithin };
         var filtered = await otodomService.FetchListingsAsync(specs);
         return Ok(filtered);
