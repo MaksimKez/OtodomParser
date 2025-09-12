@@ -13,8 +13,9 @@ public class PublishingBackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var retryCount = 0;
-        while (stoppingToken.IsCancellationRequested)
+        while (!stoppingToken.IsCancellationRequested)
         {
+            Console.WriteLine("Publishing listings to RabbitMQ");
             try
             {
                 using var scope = serviceProvider.CreateScope();
