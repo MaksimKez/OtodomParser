@@ -1,10 +1,12 @@
-using Infrastructure.Extensions;
 using Application.Extensions;
+using Infrastructure.Extensions;
+using Rabbitmq.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddRabbitMqInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

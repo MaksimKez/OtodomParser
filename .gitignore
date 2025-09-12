@@ -3,3 +3,4 @@ Api/obj
 Domain/bin
 Domain/obj
 .idea
+Infrastructure.Rabbitmq/obj
