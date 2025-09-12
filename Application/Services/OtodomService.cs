@@ -25,19 +25,22 @@ public class OtodomService : IOtodomService
 
     public async Task<IEnumerable<ListingCommon>> FetchListingsAsync(params object[]? specs)
     {
-        
-        string path;
+        string path, html;
         if (specs is null)
+        {
             path = _pathProvider.GetNonFilteredPath();
+            html = await _client.GetPageContentAsync(path);
+            return await _parser.ParseListingsAsync(html);
+        }
         else
             path = specs.Length switch
             {
                 1 => _pathProvider.BuildDaysSinceCreatedOnly(specs[0]),
                 > 0 => _pathProvider.BuildFilteredPath(specs),
-                _ => _pathProvider.BuildNonFilteredPath(specs)
+                _ => _pathProvider.BuildFilteredPath(specs)
             };
 
-        var html = await _client.GetPageContentAsync(path);
+        html = await _client.GetPageContentAsync(path);
         
         var listings = await _parser.ParseFilteredListingsAsync(html);
         return listings;
