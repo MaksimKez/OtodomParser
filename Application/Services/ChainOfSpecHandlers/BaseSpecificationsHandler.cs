@@ -1,6 +1,6 @@
 using System.Text;
 using Application.Services.ChainOfSpecHandlers.Bases;
-using Domain.Models.Enums;
+using Domain.Enums;
 using Domain.Models.Specs;
 
 namespace Application.Services.ChainOfSpecHandlers;
@@ -10,13 +10,13 @@ public class BaseSpecificationsHandler : SpecHandlerBase
     public override StringBuilder Handle(object spec, StringBuilder sb)
     {
         if (spec is not BaseSpecifications baseSpec) return base.Handle(spec, sb);
-
+        
         if (baseSpec.TransactionType is not null) sb.Append($"{HandleTransactionType(baseSpec.TransactionType)}/");
         
         if (baseSpec.EstateType is not null) sb.Append($"{HandleEstateType(baseSpec.EstateType)}/");
         
         if (baseSpec.Localization is not null)
-            sb.Append($"{baseSpec.Localization}?");
+            sb.Append($"{HandleLocalization(baseSpec.Localization)}?");
         else
             sb.Append("cala-polska?");
         
@@ -26,6 +26,11 @@ public class BaseSpecificationsHandler : SpecHandlerBase
         return base.Handle(spec, sb);
     }
 
+    private static string HandleLocalization(string localization)
+    {
+        // Use provided localization verbatim (e.g., "mazowieckie/warszawa/warszawa/warszawa")
+        return localization.Trim('/');
+    }
 
     private static string HandleTransactionType(TransactionType? transactionType) =>
         transactionType switch

@@ -1,9 +1,10 @@
-using Domain.Models;
 using Domain.Models.Common;
 
 namespace Application.Abstractions;
 
 public interface IParser
 {
-    Task<IEnumerable<AdvertListItem>> ParseListingsAsync(string listingText);
+    Task<IEnumerable<ListingCommon>> ParseListingsAsync(string html);
+    Task<IEnumerable<ListingCommon>> ParseFilteredListingsAsync(string html);
+
 }
