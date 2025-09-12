@@ -32,13 +32,12 @@ public class OtodomService : IOtodomService
             html = await _client.GetPageContentAsync(path);
             return await _parser.ParseListingsAsync(html);
         }
-        else
-            path = specs.Length switch
-            {
-                1 => _pathProvider.BuildDaysSinceCreatedOnly(specs[0]),
-                > 0 => _pathProvider.BuildFilteredPath(specs),
-                _ => _pathProvider.BuildFilteredPath(specs)
-            };
+
+        path = specs.Length switch
+        {
+            1 => _pathProvider.BuildDaysSinceCreatedOnly(specs[0]),
+            _ => _pathProvider.BuildFilteredPath(specs),
+        };
 
         html = await _client.GetPageContentAsync(path);
         
