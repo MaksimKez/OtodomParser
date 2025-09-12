@@ -51,9 +51,8 @@ public sealed class RabbitMqConnection : IRabbitMqConnection, IDisposable
 
     public void Dispose()
     {
-        if (_connection.IsValueCreated)
-        {
-            try { _connection.Value.Dispose(); } catch { /* ignore */ }
-        }
+        if (!_connection.IsValueCreated) return;
+                                                //temp
+        try { _connection.Value.Dispose(); } catch { throw; }
     }
 }
